@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Student</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Update Student</h1>
+    <form action="{{ url_for('update_student', student_id=student._id) }}" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ student.name }}" required><br><br>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" value="{{ student.age }}" required><br><br>
+
+        <label for="grades">Grades (comma separated):</label>
+        <input type="text" id="grades" name="grades" value="{{ student.grades | join(',') }}" required><br><br>
+
+        <button type="submit">Update Student</button>
+    </form>
+
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</body>
+</html>

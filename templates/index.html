@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>School Management</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+<body>
+    <h1>Students and Courses</h1>
+
+    <h2>Students</h2>
+    <ul>
+        {% for student in students %}
+            <li>
+                Name: {{ student.name }}, Age: {{ student.age }}, Active: {{ student.active }}
+                <a href="{{ url_for('update_student', student_id=student._id) }}">Edit</a>
+                <form action="{{ url_for('delete_student', student_id=student._id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Courses</h2>
+    <ul>
+        {% for course in courses %}
+            <li>
+                Course Name: {{ course.course_name }}, Active: {{ course.active }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>All Students</h2>
+<ul>
+    {% for student in students %}
+        <li>
+           
+            {% if student.totalGrade is defined %}
+            - Total Grade: {{ student.totalGrade or 'Not calculated yet' }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+
+    <a href="{{ url_for('add_student') }}">Add New Student</a> | <a href="{{ url_for('add_course') }}">Add New Course</a>
+</body>
+</html>
