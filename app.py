@@ -128,29 +128,111 @@ def add_course():
     return render_template('add_course.html', students=all_students)
 
 
-
 # 4. Find Queries with Logical Operators
-@app.route('/find_queries')
-def find_queries():
-    # Example using $or and $in
-    query_1 = students.find({"$or": [{"age": 20}, {"age": 22}]})
-    
-    # Example using $in
-    query_2 = students.find({"grades": {"$in": [80, 85]}})
+@app.route('/custom_query', methods=['GET', 'POST'])
+def custom_query():
+    results = []
+    error = None
+    if request.method == 'POST':
+        # Get data from the form
+        field1 = request.form.get('field1')
+        value1 = request.form.get('value1')
+        operator = request.form.get('operator')
 
-    return render_template('find_queries.html', query_1=query_1, query_2=query_2)
+        # Ensure the required fields are provided
+        if not field1 or not value1:
+            return render_template('custom_query.html', results=[], error="Please provide both field and value.")
+
+        # Convert value to int if possible, or keep it as a string for other cases
+        try:
+            value1 = int(value1)
+        except ValueError:
+            pass
+
+        # Build the query based on the operator
+        query = {}
+
+        # Handling logical operators: $or, $and, $nor
+        if operator in ['or', 'and', 'nor']:
+            field2 = request.form.get('field2')
+            value2 = request.form.get('value2')
+
+            # Ensure second field and value are provided for logical operators
+            if not field2 or not value2:
+                return render_template('custom_query.html', results=[], error="Please provide both field2 and value2 for logical operators.")
+
+            try:
+                value2 = int(value2)
+            except ValueError:
+                pass
+
+            if operator == 'or':
+                query = { "$or": [{field1: value1}, {field2: value2}] }
+            elif operator == 'and':
+                query = { "$and": [{field1: value1}, {field2: value2}] }
+            elif operator == 'nor':
+                query = { "$nor": [{field1: value1}, {field2: value2}] }
+
+        # Handling $in and $all (values can be a list)
+        elif operator in ['in', 'all']:
+            # Split the value1 input into a list if it's a comma-separated string
+            if isinstance(value1, str):
+                value1 = [item.strip() for item in value1.split(',')]
+            query = {field1: {f"${operator}": value1}}
+
+        # Handling $size: The value must be an integer specifying the size of the list/array
+        elif operator == 'size':
+            try:
+                value1 = int(value1)
+            except ValueError:
+                return render_template('custom_query.html', results=[], error="Please provide a valid integer for the size operator.")
+            query = {field1: {"$size": value1}}
+
+        # Handling $expr for field comparisons or calculations (Dynamic Comparison)
+        elif operator == 'expr':
+            comparison_operator = request.form.get('comparison_operator')
+            
+            # Ensure that comparison operator is provided
+            if not comparison_operator:
+                return render_template('custom_query.html', results=[], error="Please select a comparison operator (e.g., gt, lt, eq).")
+            
+            # Determine the comparison logic based on the chosen comparison operator
+            if comparison_operator == 'gt':
+                query = {"$expr": {"$gt": [f"${field1}", value1]}}
+            elif comparison_operator == 'lt':
+                query = {"$expr": {"$lt": [f"${field1}", value1]}}
+            elif comparison_operator == 'eq':
+                query = {"$expr": {"$eq": [f"${field1}", value1]}}
+            elif comparison_operator == 'gte':
+                query = {"$expr": {"$gte": [f"${field1}", value1]}}
+            elif comparison_operator == 'lte':
+                query = {"$expr": {"$lte": [f"${field1}", value1]}}
+            else:
+                return render_template('custom_query.html', results=[], error="Invalid comparison operator.")
+
+        # Default case: for simple queries where no special operator is provided
+        else:
+            query = {field1: value1}
+
+        # Execute the query
+        results = list(students.find(query))
+
+    return render_template('custom_query.html', results=results, error=error)
 
 # 6. Multiply All Array Elements (Sum grades and store in totalGrade)
 @app.route('/update_grades')
 def update_grades():
-    # Loop through students and calculate totalGrade
     for student in students.find():
-        total_grade = sum(student['grades'])
+        grades = student.get('grades', [])
+        if isinstance(grades, list):
+            total_grade = sum(grades)
+        else:
+            total_grade = 0
         students.update_one(
             {"_id": student["_id"]},
             {"$set": {"totalGrade": total_grade}}
         )
-    
+        print(f"Updated {student['name']} with total grade: {total_grade}")
     return redirect('/')
 
 if __name__ == '__main__':
