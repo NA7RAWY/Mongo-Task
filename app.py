@@ -1,27 +1,28 @@
 from flask import Flask, render_template, request, redirect
 from pymongo import MongoClient, IndexModel, ASCENDING, DESCENDING
-from bson import ObjectId  # To handle ObjectId correctly
+from bson import ObjectId 
 
 app = Flask(__name__)
 
-# MongoDB connection
+# MongoDB connect
 client = MongoClient("mongodb://localhost:27017/")
 db = client['School']
 students = db['students']
 courses = db['courses']
 
-# Create some collections and insert documents with various field types
+
 if students.count_documents({}) == 0:
     students.insert_many([
-    {"name": "Alice", "age": 20, "grades": [90, 80, 85], "address": {"city": "Cairo", "zip": "12345"}, "active": True},
-    {"name": "Bob", "age": 22, "grades": [70, 75, 80], "address": {"city": "Alexandria", "zip": "54321"}, "active": False},
-    {"name": "Charlie", "age": 23, "grades": [88, 92, 85], "address": {"city": "Giza", "zip": "67890"}, "active": True}
+    {"name": "Mahmoud", "age": 20, "grades": [90, 80, 85], "address": {"city": "Cairo", "zip": "12345"}, "active": True},
+    {"name": "Mostafa", "age": 21, "grades": [70, 75, 80], "address": {"city": "Alexandria", "zip": "54321"}, "active": False},
+    {"name": "Ahmed", "age": 22, "grades": [88, 92, 85], "address": {"city": "Giza", "zip": "67890"}, "active": True},
+    {"name": "Ibrahim", "age": 23, "grades": [95, 87, 85], "address": {"city": "Fayium", "zip": "58746"}, "active": False}
 ])
 
 initial_courses = [
-    {"course_name": "Math", "students_enrolled": ["Alice", "Bob"], "active": True},
-    {"course_name": "Science", "students_enrolled": ["Charlie", "Alice"], "active": True},
-    {"course_name": "History", "students_enrolled": ["Bob"], "active": False}
+    {"course_name": "MIS", "students_enrolled": ["Mahmoud", "Mostafa"], "active": True},
+    {"course_name": "CS", "students_enrolled": ["Ibrahim", "Mahmoud"], "active": True},
+    {"course_name": "NS", "students_enrolled": ["Mostafa","Ahmed"], "active": False}
 ]
 
 for course in initial_courses:
@@ -31,11 +32,11 @@ for course in initial_courses:
 
 # 1. Create Indexes
 students.create_indexes([
-    IndexModel([("name", ASCENDING)]),  # Single field index
-    IndexModel([("age", ASCENDING), ("name", DESCENDING)]),  # Compound index
+    IndexModel([("name", ASCENDING)]),  
+    IndexModel([("age", ASCENDING), ("name", DESCENDING)]),  
 ])
 
-courses.create_index([("course_name", ASCENDING)], unique=True)  # Unique index on course_name
+courses.create_index([("course_name", ASCENDING)], unique=True)  
 
 @app.route('/')
 def index():
@@ -76,10 +77,10 @@ def update_student(student_id):
         new_age = int(request.form['age'])
         new_grades = list(map(int, request.form['grades'].split(',')))
 
-        # Example of using $set operator to update data
+        
         students.update_one(
             {"_id": student["_id"]},
-            {"$set": {
+            {"$set": { #set عشان منقعدش ندور
                 "name": new_name,
                 "age": new_age,
                 "grades": new_grades
@@ -101,29 +102,28 @@ def add_course():
         students_enrolled = request.form.getlist('students_enrolled')
         active = True if 'active' in request.form else False
 
-        # Check if the course already exists by searching with course_name
+       
         existing_course = courses.find_one({"course_name": course_name})
         if not existing_course:
-            # Insert the course data if it doesn't exist
+            
             course_id = courses.insert_one({
                 "course_name": course_name,
                 "students_enrolled": students_enrolled,
                 "active": active
             }).inserted_id
 
-            # Enroll students in the course
             for student_name in students_enrolled:
                 students.update_one(
                     {"name": student_name},
-                    {"$push": {"courses": str(course_id)}}
+                    {"$push": {"courses": str(course_id)}} #push عشان مندورش بردو
                 )
         else:
-            # If the course already exists, handle it by either ignoring it or displaying a message
+          
             print(f"Course {course_name} already exists.")
 
         return redirect('/')
 
-    # Fetch all students for course enrollment
+  
     all_students = students.find()
     return render_template('add_course.html', students=all_students)
 
@@ -134,30 +134,25 @@ def custom_query():
     results = []
     error = None
     if request.method == 'POST':
-        # Get data from the form
+
         field1 = request.form.get('field1')
         value1 = request.form.get('value1')
         operator = request.form.get('operator')
 
-        # Ensure the required fields are provided
         if not field1 or not value1:
             return render_template('custom_query.html', results=[], error="Please provide both field and value.")
 
-        # Convert value to int if possible, or keep it as a string for other cases
         try:
             value1 = int(value1)
         except ValueError:
             pass
 
-        # Build the query based on the operator
         query = {}
 
-        # Handling logical operators: $or, $and, $nor
         if operator in ['or', 'and', 'nor']:
             field2 = request.form.get('field2')
             value2 = request.form.get('value2')
 
-            # Ensure second field and value are provided for logical operators
             if not field2 or not value2:
                 return render_template('custom_query.html', results=[], error="Please provide both field2 and value2 for logical operators.")
 
@@ -173,14 +168,12 @@ def custom_query():
             elif operator == 'nor':
                 query = { "$nor": [{field1: value1}, {field2: value2}] }
 
-        # Handling $in and $all (values can be a list)
         elif operator in ['in', 'all']:
-            # Split the value1 input into a list if it's a comma-separated string
+
             if isinstance(value1, str):
                 value1 = [item.strip() for item in value1.split(',')]
             query = {field1: {f"${operator}": value1}}
 
-        # Handling $size: The value must be an integer specifying the size of the list/array
         elif operator == 'size':
             try:
                 value1 = int(value1)
@@ -188,15 +181,12 @@ def custom_query():
                 return render_template('custom_query.html', results=[], error="Please provide a valid integer for the size operator.")
             query = {field1: {"$size": value1}}
 
-        # Handling $expr for field comparisons or calculations (Dynamic Comparison)
         elif operator == 'expr':
             comparison_operator = request.form.get('comparison_operator')
             
-            # Ensure that comparison operator is provided
             if not comparison_operator:
                 return render_template('custom_query.html', results=[], error="Please select a comparison operator (e.g., gt, lt, eq).")
             
-            # Determine the comparison logic based on the chosen comparison operator
             if comparison_operator == 'gt':
                 query = {"$expr": {"$gt": [f"${field1}", value1]}}
             elif comparison_operator == 'lt':
@@ -210,16 +200,13 @@ def custom_query():
             else:
                 return render_template('custom_query.html', results=[], error="Invalid comparison operator.")
 
-        # Default case: for simple queries where no special operator is provided
         else:
             query = {field1: value1}
 
-        # Execute the query
         results = list(students.find(query))
 
     return render_template('custom_query.html', results=results, error=error)
 
-# 6. Multiply All Array Elements (Sum grades and store in totalGrade)
 @app.route('/update_grades')
 def update_grades():
     for student in students.find():
@@ -234,6 +221,38 @@ def update_grades():
         )
         print(f"Updated {student['name']} with total grade: {total_grade}")
     return redirect('/')
+
+
+# 3. 3.	Delete Documents using a filter condition
+@app.route('/delete_dynamic', methods=['GET', 'POST'])
+def delete_dynamic():
+    message = None
+    if request.method == 'POST':
+        collection_name = request.form['collection']
+        field = request.form['field']
+        value = request.form['value']
+        delete_type = request.form.get('delete_type', 'one')  # default to one
+
+        try:
+            value = int(value)
+        except ValueError:
+            pass
+
+        collection = students if collection_name == 'students' else courses
+
+        if delete_type == 'many':
+            result = collection.delete_many({field: value})
+            message = f"Deleted {result.deleted_count} documents from {collection_name} where {field} = {value}"
+        else:
+            result = collection.delete_one({field: value})
+            if result.deleted_count:
+                message = f"Deleted one document from {collection_name} where {field} = {value}"
+            else:
+                message = f"No document found in {collection_name} with {field} = {value}"
+
+    return render_template('delete_dynamic.html', message=message)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dynamic Delete</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+<body>
+    <h2>Delete Document</h2>
+    <form method="POST">
+        <label>Collection:</label>
+        <select name="collection">
+            <option value="students">Students</option>
+            <option value="courses">Courses</option>
+        </select><br><br>
+
+        <label>Field:</label>
+        <input type="text" name="field" required><br><br>
+
+        <label>Value:</label>
+        <input type="text" name="value" required><br><br>
+
+        <label>Delete Type:</label>
+        <select name="delete_type">
+            <option value="one">Delete One</option>
+            <option value="many">Delete Many</option>
+        </select><br><br>
+
+        <button type="submit">Delete</button>
+    </form>
+
+    {% if message %}
+        <p><strong>{{ message }}</strong></p>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}">Back to Home</a>
+
+</body>
+</html>
