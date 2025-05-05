@@ -5,9 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic MongoDB Query</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
+    <style>
+        .query-section {
+            background-color: var(--white);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .results-section {
+            margin-top: var(--space-xl);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dynamic MongoDB Query</h1>
+    </header>
 
-function toggleAdditionalFields() {
+    <main class="container">
+        <section class="query-section">
+            <form method="POST" class="form">
+                <div class="form-group">
+                    <label for="field1">Field Name</label>
+                    <input type="text" name="field1" id="field1" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="value1">Field Value</label>
+                    <input type="text" name="value1" id="value1" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="operator">Query Operator</label>
+                    <select name="operator" id="operator" class="form-control" onchange="toggleAdditionalFields()" required>
+                        <option value="">-- Select Operator --</option>
+                        <option value="or">OR</option>
+                        <option value="and">AND</option>
+                        <option value="nor">NOR</option>
+                        <option value="in">IN</option>
+                        <option value="all">ALL</option>
+                        <option value="size">SIZE</option>
+                        <option value="expr">EXPR</option>
+                    </select>
+                </div>
+                
+                <div id="additional-fields" class="form-group" style="display: none;">
+                    <label for="field2">Additional Field</label>
+                    <input type="text" name="field2" id="field2" class="form-control">
+                    
+                    <label for="value2">Additional Value</label>
+                    <input type="text" name="value2" id="value2" class="form-control">
+                </div>
+                
+                <div id="expr-fields" class="form-group" style="display: none;">
+                    <label for="comparison_operator">Comparison Operator</label>
+                    <select name="comparison_operator" id="comparison_operator" class="form-control">
+                        <option value="gt">Greater Than</option>
+                        <option value="lt">Less Than</option>
+                        <option value="eq">Equal</option>
+                        <option value="gte">Greater Than or Equal</option>
+                        <option value="lte">Less Than or Equal</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn">Run Query</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </section>
+
+        {% if error %}
+            <div class="alert error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <section class="results-section">
+            <h2>Query Results</h2>
+            {% if results %}
+                <ul class="list">
+                    {% for student in results %}
+                        <li class="list-item">
+                            <strong>{{ student.name }}</strong>
+                            <span class="text-light">Age: {{ student.age }}</span>
+                            <span class="badge">Grades: {{ student.grades }}</span>
+                            <span class="text-light">Active: {{ student.active }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-light">No results to display. Run a query to see results.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 School Management System</p>
+    </footer>
+
+    <script>
+        function toggleAdditionalFields() {
             const operator = document.getElementById("operator").value;
             const additionalFields = document.getElementById("additional-fields");
             const exprFields = document.getElementById("expr-fields");
@@ -24,84 +123,9 @@ function toggleAdditionalFields() {
             }
         }
 
-        window.onload = function () {
+        window.onload = function() {
             toggleAdditionalFields();
         }
     </script>
-    <style>
-        #additional-fields, #expr-fields {
-            display: none;
-            margin-top: 10px;
-        }
-
-        .back-button {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Dynamic MongoDB Query</h1>
-
-
-    <form method="POST">
-        <label for="field1">Field 1:</label>
-        <input type="text" name="field1" id="field1" required>
-        
-        <label for="value1">Value 1:</label>
-        <input type="text" name="value1" id="value1" required>
-        
-        <label for="operator">Operator:</label>
-        <select name="operator" id="operator" onchange="toggleAdditionalFields()" required>
-            <option value="">-- Select --</option>
-            <option value="or">OR</option>
-            <option value="and">AND</option>
-            <option value="nor">NOR</option>
-            <option value="in">IN</option>
-            <option value="all">ALL</option>
-            <option value="size">SIZE</option>
-            <option value="expr">EXPR</option>
-        </select>
-        
- 
-        <div id="additional-fields">
-            <label for="field2">Field 2:</label>
-            <input type="text" name="field2" id="field2">
-            
-            <label for="value2">Value 2:</label>
-            <input type="text" name="value2" id="value2">
-        </div>
-        
-        <div id="expr-fields">
-            <label for="comparison_operator">Comparison Operator:</label>
-            <select name="comparison_operator" id="comparison_operator" required>
-                <option value="gt">Greater Than</option>
-                <option value="lt">Less Than</option>
-                <option value="eq">Equal</option>
-                <option value="gte">Greater Than or Equal</option>
-                <option value="lte">Less Than or Equal</option>
-            </select>
-        </div>
-        
-        <button type="submit">Run Query</button>
-    </form>
-
-    <div class="back-button">
-        <a href="{{ url_for('index') }}">← Back to Home</a>
-    </div>
-
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
-
-    <h2>Results:</h2>
-    {% if results %}
-        <ul>
-            {% for student in results %}
-                <li>{{ student.name }} - Age: {{ student.age }} - Grades: {{ student.grades }} - Active: {{ student.active }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No results to display.</p>
-    {% endif %}
 </body>
 </html>

@@ -1,102 +1,281 @@
-/* ملف CSS بسيط */
+:root {
+    --primary-color: #4CAF50;
+    --primary-hover: #45a049;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --white: #ffffff;
+    --gray: #f2f2f2;
+    --footer-bg: #333;
+    --transition: all 0.3s ease;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Inter', Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 header {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--white);
     text-align: center;
-    padding: 10px 0;
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    background-color: var(--white);
+    padding: 1rem;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    margin-bottom: 1.5rem;
+}
+
+nav a {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin: 0 1rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+nav a:hover, nav a:focus {
+    color: var(--primary-hover);
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: var(--border-color);
+    margin: 1.5rem 0;
 }
 
 .container {
-    width: 80%;
-    margin: 20px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: min(90%, 1200px);
+    margin: 2rem auto;
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    transition: var(--transition);
 }
 
 h1, h2 {
-    color: #333;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+}
+
+h2 {
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    background-color: var(--white);
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+ul li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+ul li strong {
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+ul li a {
+    margin-left: 1rem;
+    font-size: 0.9rem;
+}
+
+ul li form {
+    display: inline;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    display: block;
 }
 
 table, th, td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
 }
 
 th, td {
-    padding: 8px;
+    padding: 0.75rem;
     text-align: left;
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: var(--gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+tr:nth-child(even) {
+    background-color: var(--white);
+}
+
+tr:nth-child(odd) {
+    background-color: var(--gray);
+}
+
+tr:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+    transition: var(--transition);
 }
 
 button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--white);
     border: none;
-    padding: 10px 20px;
+    padding: 0.5rem 1rem;
     text-align: center;
     cursor: pointer;
-    border-radius: 5px;
-    margin: 10px 0;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    font-size: 0.9rem;
 }
 
-button:hover {
-    background-color: #45a049;
+button:hover, button:focus {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 1rem;
+    max-width: 500px;
 }
 
 input, select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
 }
 
 input[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--white);
     cursor: pointer;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
 }
 
 a {
-    color: #4CAF50;
+    color: var(--primary-color);
     text-decoration: none;
+    transition: var(--transition);
 }
 
-a:hover {
+a:hover, a:focus {
+    color: var(--primary-hover);
     text-decoration: underline;
 }
 
 footer {
-    background-color: #333;
-    color: white;
+    background-color: var(--footer-bg);
+    color: var(--white);
     text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    bottom: 0;
+    padding: 1rem 0;
+    margin-top: auto;
     width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 1rem;
+    }
+
+    nav a {
+        margin: 0 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    ul li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    ul li a, ul li form {
+        margin-left: 0;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 0.5rem;
+    }
+
+    button, input[type="submit"] {
+        padding: 0.6rem 1rem;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    button, input[type="submit"], a, .container, ul li, tr {
+        transition: none;
+    }
 }

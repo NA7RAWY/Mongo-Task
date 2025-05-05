@@ -1,40 +1,59 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dynamic Delete</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <h2>Delete Document</h2>
-    <form method="POST">
-        <label>Collection:</label>
-        <select name="collection">
-            <option value="students">Students</option>
-            <option value="courses">Courses</option>
-        </select><br><br>
+    <header>
+        <h1>Delete Document</h1>
+    </header>
 
-        <label>Field:</label>
-        <input type="text" name="field" required><br><br>
+    <main class="container">
+        <form method="POST" class="form">
+            <div class="form-group">
+                <label for="collection">Collection</label>
+                <select name="collection" id="collection" class="form-control">
+                    <option value="students">Students</option>
+                    <option value="courses">Courses</option>
+                </select>
+            </div>
 
-        <label>Value:</label>
-        <input type="text" name="value" required><br><br>
+            <div class="form-group">
+                <label for="field">Field Name</label>
+                <input type="text" name="field" id="field" class="form-control" required>
+            </div>
 
-        <label>Delete Type:</label>
-        <select name="delete_type">
-            <option value="one">Delete One</option>
-            <option value="many">Delete Many</option>
-        </select><br><br>
+            <div class="form-group">
+                <label for="value">Field Value</label>
+                <input type="text" name="value" id="value" class="form-control" required>
+            </div>
 
-        <button type="submit">Delete</button>
-    </form>
+            <div class="form-group">
+                <label for="delete_type">Delete Type</label>
+                <select name="delete_type" id="delete_type" class="form-control">
+                    <option value="one">Delete One Document</option>
+                    <option value="many">Delete All Matching Documents</option>
+                </select>
+            </div>
 
-    {% if message %}
-        <p><strong>{{ message }}</strong></p>
-    {% endif %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
 
-    <a href="{{ url_for('index') }}">Back to Home</a>
+        {% if message %}
+            <div class="alert {% if 'success' in message %}success{% else %}error{% endif %} mt-4">
+                {{ message }}
+            </div>
+        {% endif %}
+    </main>
 
+    <footer>
+        <p>© 2025 School Management System</p>
+    </footer>
 </body>
 </html>

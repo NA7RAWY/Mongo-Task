@@ -7,48 +7,60 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header>
+        <h1>School Management System</h1>
+    </header>
 
     <nav>
-        <a href="{{ url_for('add_student') }}">➕ Add Student</a> |
-        <a href="{{ url_for('add_course') }}">📚 Add Course</a> |
-        <a href="{{ url_for('custom_query') }}">🔍 Run Custom Query</a> |
-        <a href="{{ url_for('update_grades') }}">🧮 Calculate Total Grades</a>
-        <a href="/delete_dynamic">🗑️ Delete Document</a>
-
-
+        <a href="{{ url_for('add_student') }}" class="nav-link">➕ Add Student</a>
+        <a href="{{ url_for('add_course') }}" class="nav-link">📚 Add Course</a>
+        <a href="{{ url_for('custom_query') }}" class="nav-link">🔍 Run Custom Query</a>
+        <a href="{{ url_for('update_grades') }}" class="nav-link">🧮 Calculate Grades</a>
+        <a href="/delete_dynamic" class="nav-link">🗑️ Delete Document</a>
     </nav>
 
-    <hr>
+    <main class="container">
+        <section>
+            <h2>Students</h2>
+            <ul class="list">
+                {% for student in students %}
+                    <li class="list-item">
+                        <div>
+                            <strong>{{ student.name }}</strong> 
+                            <span class="text-light">Age: {{ student.age }}</span> 
+                            <span class="text-light">Active: {{ student.active }}</span>
+                            {% if student.totalGrade is defined %}
+                                <span class="badge">Total Grade: {{ student.totalGrade }}</span>
+                            {% else %}
+                                <span class="badge">Grade: Not calculated</span>
+                            {% endif %}
+                        </div>
+                        <div class="actions">
+                            <a href="{{ url_for('update_student', student_id=student._id) }}" class="btn btn-sm">✏️ Edit</a>
+                            <form action="{{ url_for('delete_student', student_id=student._id) }}" method="POST" class="inline-form">
+                                <button type="submit" class="btn btn-sm btn-outline">🗑️ Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
 
-    <h2>Students</h2>
-    <ul>
-        {% for student in students %}
-            <li>
-                <strong>{{ student.name }}</strong> - Age: {{ student.age }} - Active: {{ student.active }}
-                {% if student.totalGrade is defined %}
-                - Total Grade: {{ student.totalGrade }}
-            {% else %}
-                - Total Grade: Not calculated yet
-            {% endif %}
+        <section>
+            <h2>Courses</h2>
+            <ul class="list">
+                {% for course in courses %}
+                    <li class="list-item">
+                        <strong>{{ course.course_name }}</strong>
+                        <span class="text-light">Active: {{ course.active }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
 
-
-            
-            
-                <a href="{{ url_for('update_student', student_id=student._id) }}">✏️ Edit</a>
-                <form action="{{ url_for('delete_student', student_id=student._id) }}" method="POST" style="display:inline;">
-                    <button type="submit">🗑️ Delete</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <h2>Courses</h2>
-    <ul>
-        {% for course in courses %}
-            <li>
-                <strong>{{ course.course_name }}</strong> - Active: {{ course.active }}
-            </li>
-        {% endfor %}
-    </ul>
+    <footer>
+        <p>© 2025 School Management System | MongoDB Flask Application</p>
+    </footer>
 </body>
 </html>

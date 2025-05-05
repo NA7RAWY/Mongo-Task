@@ -7,20 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Update Student</h1>
-    <form action="{{ url_for('update_student', student_id=student._id) }}" method="POST">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="{{ student.name }}" required><br><br>
+    <header>
+        <h1>Update Student</h1>
+    </header>
 
-        <label for="age">Age:</label>
-        <input type="number" id="age" name="age" value="{{ student.age }}" required><br><br>
+    <main class="container">
+        <form action="{{ url_for('update_student', student_id=student._id) }}" method="POST" class="form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ student.name }}" required>
+            </div>
 
-        <label for="grades">Grades (comma separated):</label>
-        <input type="text" id="grades" name="grades" value="{{ student.grades | join(',') }}" required><br><br>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" class="form-control" value="{{ student.age }}" required>
+            </div>
 
-        <button type="submit">Update Student</button>
-    </form>
+            <div class="form-group">
+                <label for="grades">Grades (comma separated)</label>
+                <input type="text" id="grades" name="grades" class="form-control" value="{{ student.grades | join(',') }}" required>
+                <small class="text-light">Example: 85,92,78</small>
+            </div>
 
-    <a href="{{ url_for('index') }}">Back to Home</a>
+            <div class="form-actions">
+                <button type="submit" class="btn">Update Student</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>© 2025 School Management System</p>
+    </footer>
 </body>
 </html>

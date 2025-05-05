@@ -7,29 +7,54 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Add New Student</h1>
-    <form action="{{ url_for('add_student') }}" method="POST">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+    <header>
+        <h1>Add New Student</h1>
+    </header>
 
-        <label for="age">Age:</label>
-        <input type="number" id="age" name="age" required><br><br>
+    <main class="container">
+        <form action="{{ url_for('add_student') }}" method="POST" class="form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
 
-        <label for="grades">Grades (comma separated):</label>
-        <input type="text" id="grades" name="grades" required><br><br>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" class="form-control" required>
+            </div>
 
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city" required><br><br>
+            <div class="form-group">
+                <label for="grades">Grades (comma separated)</label>
+                <input type="text" id="grades" name="grades" class="form-control" required>
+                <small class="text-light">Example: 85,92,78</small>
+            </div>
 
-        <label for="zip">Zip:</label>
-        <input type="text" id="zip" name="zip" required><br><br>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" class="form-control" required>
+            </div>
 
-        <label for="active">Active:</label>
-        <input type="checkbox" id="active" name="active"><br><br>
+            <div class="form-group">
+                <label for="zip">ZIP Code</label>
+                <input type="text" id="zip" name="zip" class="form-control" required>
+            </div>
 
-        <button type="submit">Add Student</button>
-    </form>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="active" name="active">
+                    <span>Active Student</span>
+                </label>
+            </div>
 
-    <a href="{{ url_for('index') }}">Back to Home</a>
+            <div class="form-actions">
+                <button type="submit" class="btn">Add Student</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>© 2025 School Management System</p>
+    </footer>
 </body>
 </html>

@@ -7,24 +7,43 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Add New Course</h1>
-    <form action="{{ url_for('add_course') }}" method="POST">
-        <label for="course_name">Course Name:</label>
-        <input type="text" id="course_name" name="course_name" required><br><br>
+    <header>
+        <h1>Add New Course</h1>
+    </header>
 
-        <label for="students_enrolled">Students Enrolled (select multiple):</label>
-        <select id="students_enrolled" name="students_enrolled" multiple>
-            {% for student in students %}
-                <option value="{{ student.name }}">{{ student.name }}</option>
-            {% endfor %}
-        </select><br><br>
+    <main class="container">
+        <form action="{{ url_for('add_course') }}" method="POST" class="form">
+            <div class="form-group">
+                <label for="course_name">Course Name</label>
+                <input type="text" id="course_name" name="course_name" class="form-control" required>
+            </div>
 
-        <label for="active">Active:</label>
-        <input type="checkbox" id="active" name="active"><br><br>
+            <div class="form-group">
+                <label for="students_enrolled">Students Enrolled</label>
+                <select id="students_enrolled" name="students_enrolled" class="form-control" multiple>
+                    {% for student in students %}
+                        <option value="{{ student.name }}">{{ student.name }}</option>
+                    {% endfor %}
+                </select>
+                <small>Hold Ctrl/Cmd to select multiple students</small>
+            </div>
 
-        <button type="submit">Add Course</button>
-    </form>
+            <div class="form-group">
+                <label for="active" class="checkbox-label">
+                    <input type="checkbox" id="active" name="active">
+                    <span>Active Course</span>
+                </label>
+            </div>
 
-    <a href="{{ url_for('index') }}">Back to Home</a>
+            <div class="form-actions">
+                <button type="submit" class="btn">Add Course</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>© 2025 School Management System</p>
+    </footer>
 </body>
 </html>
