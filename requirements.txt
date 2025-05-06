@@ -1,2 +1,108 @@
-flask
-pymongo
+7)
+db.students.insertMany([{
+    "name": "Kareem",
+    "age": 30,
+    "grades": [66, 70, 80],
+    "address": {"city": "Alexandria", "zip": "10001"},
+    "active": true,
+    "Phone": "0323456755"
+
+    
+},{
+    "name": "Salah",
+    "age": 25,
+    "grades": [91, 50, 75],
+    "address": {"city": "Alexandria", "zip": "10001"},
+    "active": true,
+    "Phone": "0323656755"
+
+}]
+)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+8)
+db.courses.insertOne({
+    "course_name": "NLP",
+    "students_id": [
+        ObjectId(db.students.findOne({"name": "Salah"})._id),
+        ObjectId(db.students.findOne({"name": "Ahmed"})._id)
+    ],
+    "students_enrolled": ["Salah","Ahmed"],
+    "active": true
+})
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+9)
+db.courses.aggregate([
+    {
+        $lookup: {
+            from: "students",
+            localField: "students_id",
+            foreignField: "_id",
+            as: "students_details"
+        }
+    },
+    {
+        $project: {
+            course_name: 1,
+            "students_details.name": 1,
+            "students_details.age": 1
+        }
+    }
+])
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+10)
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$address.city",
+      averageAge: { $avg: "$age" },
+      studentCount: { $sum: 1 }
+    }
+  }
+])
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+11)
+db.students.aggregate([
+    {
+        $match: {
+            active: true,
+            totalGrade: { $gt: 200 }
+        }
+    },
+    {
+        $project: {
+            name: 1,
+            city: "$address.city",
+            totalGrade: 1,
+            _id: 0
+        }
+    }
+])
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+12)
+db.students.aggregate([
+    {
+        $sort: {
+            name: 1
+        }
+    },
+    {
+        $limit: 2
+    },
+    {
+        $project: {
+            name: 1,
+            active: 1,
+            _id: 0
+        }
+    }
+])

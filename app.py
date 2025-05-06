@@ -29,6 +29,23 @@ for course in initial_courses:
     if not courses.find_one({"course_name": course["course_name"]}):
         courses.insert_one(course)
 
+def populate_students_id():
+    all_courses = courses.find()
+    for course in all_courses:
+        enrolled_names = course.get("students_enrolled", [])
+        student_ids = []
+
+        for name in enrolled_names:
+            student = students.find_one({"name": name})
+            if student:
+                student_ids.append(student["_id"])
+
+        courses.update_one(
+            {"_id": course["_id"]},
+            {"$set": {"students_id": student_ids}}
+        )
+populate_students_id()
+
 
 # 1. Create Indexes
 students.create_indexes([
@@ -90,9 +107,61 @@ def update_student(student_id):
 
     return render_template('update_student.html', student=student)
 
+@app.route('/edit_course/<course_id>', methods=['GET', 'POST'])
+def edit_course(course_id):
+    course = courses.find_one({"_id": ObjectId(course_id)})
+    all_students = list(students.find())
+
+    if request.method == 'POST':
+        new_name = request.form['course_name']
+        new_students = request.form.getlist('students_enrolled')
+        new_active = 'active' in request.form
+
+        courses.update_one(
+            {"_id": ObjectId(course_id)},
+            {"$set": {
+                "course_name": new_name,
+                "students_enrolled": new_students,
+                "active": new_active
+            }}
+        )
+
+        students.update_many(
+            {"courses": str(course_id)},
+            {"$pull": {"courses": str(course_id)}}
+        )
+
+        for student_name in new_students:
+            students.update_one(
+                {"name": student_name},
+                {"$addToSet": {"courses": str(course_id)}}
+            )
+
+        populate_students_id()
+
+        return redirect('/')
+
+    return render_template('edit_course.html', course=course, students=all_students)
+
+
 @app.route('/delete_student/<student_id>', methods=['POST'])
 def delete_student(student_id):
     students.delete_one({"_id": ObjectId(student_id)})
+    return redirect('/')
+
+@app.route('/delete_course/<course_id>', methods=['POST'])
+def delete_course(course_id):
+    course = courses.find_one({"_id": ObjectId(course_id)})
+    
+    if course:
+        courses.delete_one({"_id": ObjectId(course_id)})
+
+
+        students.update_many(
+            {"courses": course_id},
+            {"$pull": {"courses": course_id}}
+        )
+
     return redirect('/')
 
 @app.route('/add_course', methods=['GET', 'POST'])
