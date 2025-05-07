@@ -4,7 +4,6 @@ from bson import ObjectId
 
 app = Flask(__name__)
 
-# MongoDB connect
 client = MongoClient("mongodb://localhost:27017/")
 db = client['School']
 students = db['students']
@@ -47,7 +46,6 @@ def populate_students_id():
 populate_students_id()
 
 
-# 1. Create Indexes
 students.create_indexes([
     IndexModel([("name", ASCENDING)]),  
     IndexModel([("age", ASCENDING), ("name", DESCENDING)]),  
@@ -146,21 +144,37 @@ def edit_course(course_id):
 
 @app.route('/delete_student/<student_id>', methods=['POST'])
 def delete_student(student_id):
-    students.delete_one({"_id": ObjectId(student_id)})
+    student = students.find_one({"_id": ObjectId(student_id)})
+
+    if student:
+        students.delete_one({"_id": ObjectId(student_id)})
+
+        for course_id in student.get('courses', []):
+            courses.update_one(
+                {"_id": ObjectId(course_id)},
+                {"$pull": {"students_enrolled": student['name']}}
+            )
+            print(f"Removed student {student['name']} from course {course_id}")
+
     return redirect('/')
 
 @app.route('/delete_course/<course_id>', methods=['POST'])
 def delete_course(course_id):
     course = courses.find_one({"_id": ObjectId(course_id)})
-    
+
     if course:
         courses.delete_one({"_id": ObjectId(course_id)})
 
-
         students.update_many(
-            {"courses": course_id},
-            {"$pull": {"courses": course_id}}
+            {"courses": ObjectId(course_id)},
+            {"$pull": {"courses": ObjectId(course_id)}}
         )
+        students.update_many(
+            {},
+            {"$pull": {"students_enrolled": course['course_name']}}
+        )
+
+        print(f"Removed course {course['course_name']} from all students")
 
     return redirect('/')
 
@@ -197,7 +211,6 @@ def add_course():
     return render_template('add_course.html', students=all_students)
 
 
-# 4. Find Queries with Logical Operators
 @app.route('/custom_query', methods=['GET', 'POST'])
 def custom_query():
     results = []
@@ -211,7 +224,6 @@ def custom_query():
         if not field1 or not value1:
             return render_template('custom_query.html', results=[], error="Please provide both field and value.")
 
-        # convert to int if possible
         try:
             value1 = int(value1)
         except ValueError:
@@ -223,7 +235,6 @@ def custom_query():
 
         query = {}
 
-        # LOGICAL OPERATORS
         if operator in ['or', 'and', 'nor']:
             field2 = request.form.get('field2')
             value2 = request.form.get('value2')
@@ -247,7 +258,6 @@ def custom_query():
             elif operator == 'nor':
                 query = {"$nor": [{field1: value1}, {field2: value2}]}
 
-        # ARRAY OPERATORS
         elif operator in ['in', 'all']:
             if isinstance(value1, str):
                 items = [item.strip() for item in value1.split(',')]
@@ -259,7 +269,6 @@ def custom_query():
                 value1 = [convert(item) for item in items]
             query = {field1: {f"${operator}": value1}}
 
-        # SIZE OPERATOR
         elif operator == 'size':
             try:
                 value1 = int(value1)
@@ -267,14 +276,12 @@ def custom_query():
                 return render_template('custom_query.html', results=[], error="Please provide a valid integer for the size operator.")
             query = {field1: {"$size": value1}}
 
-        # EXPR OPERATOR
         elif operator == 'expr':
             comparison_operator = request.form.get('comparison_operator')
             if not comparison_operator:
                 return render_template('custom_query.html', results=[], error="Please select a comparison operator.")
             query = {"$expr": {f"${comparison_operator}": [f"${field1}", value1]}}
 
-        # DEFAULT SIMPLE QUERY
         else:
             query = {field1: value1}
 
@@ -283,8 +290,8 @@ def custom_query():
     return render_template('custom_query.html', results=results, error=error)
 
 
-@app.route('/update_grades')
-def update_grades():
+@app.route('/calculate_grades')
+def calculate_grades():
     for student in students.find():
         grades = student.get('grades', [])
         if isinstance(grades, list):
@@ -299,7 +306,8 @@ def update_grades():
     return redirect('/')
 
 
-# 3. 3.	Delete Documents using a filter condition
+
+
 @app.route('/delete_dynamic', methods=['GET', 'POST'])
 def delete_dynamic():
     message = None
@@ -307,27 +315,79 @@ def delete_dynamic():
         collection_name = request.form['collection']
         field = request.form['field']
         value = request.form['value']
-        delete_type = request.form.get('delete_type', 'one')  # default to one
+        delete_type = request.form.get('delete_type', 'one')
 
         try:
             value = int(value)
         except ValueError:
-            pass
+            if value.lower() == "true":
+                value = True
+            elif value.lower() == "false":
+                value = False
 
         collection = students if collection_name == 'students' else courses
 
-        if delete_type == 'many':
-            result = collection.delete_many({field: value})
-            message = f"Deleted {result.deleted_count} documents from {collection_name} where {field} = {value}"
-        else:
-            result = collection.delete_one({field: value})
-            if result.deleted_count:
-                message = f"Deleted one document from {collection_name} where {field} = {value}"
-            else:
+        if delete_type == 'one':
+            document = collection.find_one({field: value})
+            if not document:
                 message = f"No document found in {collection_name} with {field} = {value}"
+            else:
+                if collection_name == 'students':
+                    student_id = document['_id']
+                    student_name = document.get('name')
+
+                    courses.update_many(
+                        {"students_enrolled": student_name},
+                        {"$pull": {"students_enrolled": student_name}}
+                    )
+                    courses.update_many(
+                        {"students_id": student_id},
+                        {"$pull": {"students_id": student_id}}
+                    )
+
+                elif collection_name == 'courses':
+                    course_id = document['_id']
+
+                    students.update_many(
+                        {"courses": course_id},
+                        {"$pull": {"courses": course_id}}
+                    )
+
+                collection.delete_one({field: value})
+                message = f"Deleted one document from {collection_name} where {field} = {value}"
+
+        elif delete_type == 'many':
+            documents = list(collection.find({field: value}))
+            if not documents:
+                message = f"No documents found in {collection_name} with {field} = {value}"
+            else:
+                count = 0
+                for doc in documents:
+                    if collection_name == 'students':
+                        student_id = doc['_id']
+                        student_name = doc.get('name')
+
+                        courses.update_many(
+                            {"students_enrolled": student_name},
+                            {"$pull": {"students_enrolled": student_name}}
+                        )
+                        courses.update_many(
+                            {"students_id": student_id},
+                            {"$pull": {"students_id": student_id}}
+                        )
+
+                    elif collection_name == 'courses':
+                        course_id = doc['_id']
+
+                        students.update_many(
+                            {"courses": course_id},
+                            {"$pull": {"courses": course_id}}
+                        )
+
+                result = collection.delete_many({field: value})
+                message = f"Deleted {result.deleted_count} documents from {collection_name} where {field} = {value}"
 
     return render_template('delete_dynamic.html', message=message)
-
 
 
 if __name__ == '__main__':

@@ -46,7 +46,7 @@
         </form>
 
         {% if message %}
-            <div class="alert {% if 'success' in message %}success{% else %}error{% endif %} mt-4">
+            <div class="{% if 'Deleted' in message %}alert-success{% else %}alert-error{% endif %}">
                 {{ message }}
             </div>
         {% endif %}
