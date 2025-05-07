@@ -211,13 +211,19 @@ def custom_query():
         if not field1 or not value1:
             return render_template('custom_query.html', results=[], error="Please provide both field and value.")
 
+        # convert to int if possible
         try:
             value1 = int(value1)
         except ValueError:
-            pass
+            if isinstance(value1, str):
+                if value1.lower() == "true":
+                    value1 = True
+                elif value1.lower() == "false":
+                    value1 = False
 
         query = {}
 
+        # LOGICAL OPERATORS
         if operator in ['or', 'and', 'nor']:
             field2 = request.form.get('field2')
             value2 = request.form.get('value2')
@@ -228,21 +234,32 @@ def custom_query():
             try:
                 value2 = int(value2)
             except ValueError:
-                pass
+                if isinstance(value2, str):
+                    if value2.lower() == "true":
+                        value2 = True
+                    elif value2.lower() == "false":
+                        value2 = False
 
             if operator == 'or':
-                query = { "$or": [{field1: value1}, {field2: value2}] }
+                query = {"$or": [{field1: value1}, {field2: value2}]}
             elif operator == 'and':
-                query = { "$and": [{field1: value1}, {field2: value2}] }
+                query = {"$and": [{field1: value1}, {field2: value2}]}
             elif operator == 'nor':
-                query = { "$nor": [{field1: value1}, {field2: value2}] }
+                query = {"$nor": [{field1: value1}, {field2: value2}]}
 
+        # ARRAY OPERATORS
         elif operator in ['in', 'all']:
-
             if isinstance(value1, str):
-                value1 = [item.strip() for item in value1.split(',')]
+                items = [item.strip() for item in value1.split(',')]
+                def convert(v):
+                    try:
+                        return int(v)
+                    except ValueError:
+                        return v
+                value1 = [convert(item) for item in items]
             query = {field1: {f"${operator}": value1}}
 
+        # SIZE OPERATOR
         elif operator == 'size':
             try:
                 value1 = int(value1)
@@ -250,31 +267,21 @@ def custom_query():
                 return render_template('custom_query.html', results=[], error="Please provide a valid integer for the size operator.")
             query = {field1: {"$size": value1}}
 
+        # EXPR OPERATOR
         elif operator == 'expr':
             comparison_operator = request.form.get('comparison_operator')
-            
             if not comparison_operator:
-                return render_template('custom_query.html', results=[], error="Please select a comparison operator (e.g., gt, lt, eq).")
-            
-            if comparison_operator == 'gt':
-                query = {"$expr": {"$gt": [f"${field1}", value1]}}
-            elif comparison_operator == 'lt':
-                query = {"$expr": {"$lt": [f"${field1}", value1]}}
-            elif comparison_operator == 'eq':
-                query = {"$expr": {"$eq": [f"${field1}", value1]}}
-            elif comparison_operator == 'gte':
-                query = {"$expr": {"$gte": [f"${field1}", value1]}}
-            elif comparison_operator == 'lte':
-                query = {"$expr": {"$lte": [f"${field1}", value1]}}
-            else:
-                return render_template('custom_query.html', results=[], error="Invalid comparison operator.")
+                return render_template('custom_query.html', results=[], error="Please select a comparison operator.")
+            query = {"$expr": {f"${comparison_operator}": [f"${field1}", value1]}}
 
+        # DEFAULT SIMPLE QUERY
         else:
             query = {field1: value1}
 
         results = list(students.find(query))
 
     return render_template('custom_query.html', results=results, error=error)
+
 
 @app.route('/update_grades')
 def update_grades():
