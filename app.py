@@ -389,6 +389,12 @@ def delete_dynamic():
 
     return render_template('delete_dynamic.html', message=message)
 
+@app.route('/show_indexes')
+def show_indexes():
+    student_indexes = list(students.list_indexes())
+    course_indexes = list(courses.list_indexes())
+    return render_template('show_indexes.html', student_indexes=student_indexes, course_indexes=course_indexes)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

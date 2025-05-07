@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Indexes</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <h1>📘 Student Indexes</h1>
+        <ul>
+            {% for index in student_indexes %}
+                <li>
+                    {{ index['name'] }}: 
+                    {{ index['key'] | list }} 
+                    {% if index.get('unique') %}(Unique){% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    
+        <h1>📙 Course Indexes</h1>
+        <ul>
+            {% for index in course_indexes %}
+                <li>
+                    {{ index['name'] }}: 
+                    {{ index['key'] | list }}
+                    {% if index.get('unique') %}(Unique){% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    
+        <a href="/">⬅️ Back to Home</a>
+    </body>
+</html>
