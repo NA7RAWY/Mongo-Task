@@ -7,17 +7,17 @@ A simple web-based School Management System built using **Flask**, **MongoDB**, 
 ## 📸 Screenshots
 
 ### 🔷 Home Page
-![Home](screenshots/Screenshot\ 2025-06-24\ 205403.png)
+![Home](screenshots/01_screenshot.png)
 
 ### 🟩 Students Section
 Displays all students with their details and options to edit or delete.
 
-![Students](screenshots/Screenshot\ 2025-06-24\ 205419.png)
+![Students](screenshots/02_screenshot.png)
 
 ### 🟦 Courses Section
 Shows all courses with their active status and controls.
 
-![Courses](screenshots/Screenshot\ 2025-06-24\ 205433.png)
+![Courses](screenshots/03_screenshot.png)
 
 ---
 
