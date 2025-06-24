@@ -1,25 +1,88 @@
-# Mongo-Task
+# 🏫 School Management System – MongoDB + Flask
 
-Mongo-Task is a task management application that helps users organize their tasks and projects efficiently. The app utilizes MongoDB as its database, ensuring fast, flexible, and scalable data storage. With a user-friendly interface and robust backend API built with Flask, users can easily create, update, delete, and track tasks.
+A simple web-based School Management System built using **Flask**, **MongoDB**, and **Bootstrap**. The system allows managing students and courses with interactive features.
 
-## Features
-- Create and manage tasks
-- Categorize tasks by projects
-- Mark tasks as completed or pending
-- Store task data using MongoDB for efficient and scalable storage
-- Access task data via RESTful API built with Flask
-- Frontend built with HTML, CSS, and JavaScript
+---
 
-## Technologies Used
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Flask (Python)
-- **Database**: MongoDB
-- **API**: Flask for creating RESTful API endpoints
+## 📸 Screenshots
 
-### Prerequisites
-- Python 3.8+ (for Flask)
-- MongoDB Database Server
+### 🔷 Home Page
+![Home](screenshots/Screenshot\ 2025-06-24\ 205403.png)
 
-1. Clone the repository:
+### 🟩 Students Section
+Displays all students with their details and options to edit or delete.
+
+![Students](screenshots/Screenshot\ 2025-06-24\ 205419.png)
+
+### 🟦 Courses Section
+Shows all courses with their active status and controls.
+
+![Courses](screenshots/Screenshot\ 2025-06-24\ 205433.png)
+
+---
+
+## ⚙️ Features
+
+- ➕ Add Student & Course  
+- ✏️ Edit / Delete Records  
+- 🧮 Calculate Grades  
+- 🔍 Run Custom Mongo Queries  
+- 📁 View Indexes  
+- 🗑️ Delete Specific Documents  
+
+---
+
+## 🧰 Tech Stack
+
+- Python (Flask Framework)  
+- MongoDB (NoSQL Database)  
+- HTML / CSS / Bootstrap  
+- FontAwesome Icons  
+
+---
+
+## 🚀 How to Run
+
+1. Install dependencies:
    ```bash
-   git clone https://github.com/NA7RAWY/Mongo-Task.git
+   pip install flask pymongo
+   ```
+
+2. Run the Flask app:
+   ```bash
+   python app.py
+   ```
+
+3. Visit:
+   ```
+   http://localhost:5000
+   ```
+
+---
+
+## 📦 Folder Structure
+
+```
+Mongo-Task/
+├── app.py
+├── static/
+│   └── style.css
+├── templates/
+│   ├── index.html
+│   └── ...
+└── requirements.txt
+```
+
+---
+
+## 📌 Notes
+
+- Ensure MongoDB is running locally on port `27017`.
+- The database used is called `school_db`.
+
+---
+
+## 🧑‍💻 Author
+
+**[Mahmoud Elnahrawy](https://github.com/NA7RAWY)**  
+Built as part of a task demonstrating CRUD operations and MongoDB integration.
