@@ -1,28 +1,22 @@
 # 🏫 School Management System – MongoDB + Flask
-
-A simple web-based School Management System built using **Flask**, **MongoDB**, and **Bootstrap**. The system allows managing students and courses with interactive features.
+A **web-based school management system** built using **Flask**, **MongoDB**, and **Bootstrap**.  
+The system allows you to manage **students** and **courses** with an interactive, user-friendly interface.
 
 ---
 
 ## 📸 Screenshots
+**🏠 Home Page**  
+![Home](screenshots/01_screenshot.png)  
 
-### 🔷 Home Page
-![Home](screenshots/01_screenshot.png)
+**🟩 Students Section** — View, edit, and delete student records  
+![Students](screenshots/02_screenshot.png)  
 
-### 🟩 Students Section
-Displays all students with their details and options to edit or delete.
-
-![Students](screenshots/02_screenshot.png)
-
-### 🟦 Courses Section
-Shows all courses with their active status and controls.
-
-![Courses](screenshots/03_screenshot.png)
+**🟦 Courses Section** — Manage courses and their active status  
+![Courses](screenshots/03_screenshot.png)  
 
 ---
 
-## ⚙️ Features
-
+## 📌 Features
 - ➕ Add Student & Course  
 - ✏️ Edit / Delete Records  
 - 🧮 Calculate Grades  
@@ -32,57 +26,50 @@ Shows all courses with their active status and controls.
 
 ---
 
-## 🧰 Tech Stack
-
-- Python (Flask Framework)  
-- MongoDB (NoSQL Database)  
-- HTML / CSS / Bootstrap  
-- FontAwesome Icons  
+## 🛠 Tech Stack
+- 🐍 Python (Flask Framework)  
+- 🍃 MongoDB (NoSQL Database)  
+- 🎨 HTML / CSS / Bootstrap  
+- 🎯 FontAwesome Icons  
 
 ---
 
 ## 🚀 How to Run
+### 1️⃣ Install dependencies
+pip install flask pymongo
 
-1. Install dependencies:
-   ```bash
-   pip install flask pymongo
-   ```
+### 2️⃣ Start the Flask app
+python app.py
 
-2. Run the Flask app:
-   ```bash
-   python app.py
-   ```
-
-3. Visit:
-   ```
-   http://localhost:5000
-   ```
+### 3️⃣ Open in browser
+http://localhost:5000
 
 ---
 
-## 📦 Folder Structure
-
-```
-Mongo-Task/
-├── app.py
-├── static/
-│   └── style.css
-├── templates/
-│   ├── index.html
-│   └── ...
-└── requirements.txt
-```
+## 📂 Project Structure
+Mongo-Task/  
+├── app.py  
+├── static/  
+│   └── style.css  
+├── templates/  
+│   ├── index.html  
+│   └── ...  
+└── requirements.txt  
 
 ---
 
 ## 📌 Notes
-
-- Ensure MongoDB is running locally on port `27017`.
-- The database used is called `school_db`.
+- Ensure MongoDB is running locally on port `27017`.  
+- The database name used is `school_db`.  
 
 ---
 
-## 🧑‍💻 Author
+## 👤 Author
+**Mahmoud Elnahrawy**  
+📧 mahmoudelnahrawywork@gmail.com  
+📍 Cairo, Egypt  
 
-**[Mahmoud Elnahrawy](https://github.com/NA7RAWY)**  
-Built as part of a task demonstrating CRUD operations and MongoDB integration.
+---
+
+## 🪪 License
+MIT License — free to use, modify, and distribute.
